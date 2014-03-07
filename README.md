@@ -1,0 +1,1 @@
+To run these algorithms use <code>go run *.go</code>.
