@@ -1,29 +1,22 @@
 ﻿package main
 import ("fmt"; "log"; "os"; "io/ioutil"; "time")
 
-/** 
-	User defined.
-	
-	@true prints various extra stuff out, but slows down the bom execution
-	@false will be quick and quiet
-*/
+// User defined.
+// Set to true to print various extra stuff out (slows down the execution)
+// Set to false for quick and quiet execution.
 const debugMode bool = false
+
+// User defined.
+// Set to true to read input from two command line arguments
+// Set to false to read input from two files "pattern.txt" and "text.txt"
 const commandLineInput bool = false
 
-/**
- 	Implementation of Backward Oracle Matching algorithm (Factor based aproach).
-	
-	IF(commandLineInput == true) Requires two command line arguments.
-	@argument string to be searched "for" (pattern, search word), no spaces allowed
-	@argument one space
-	@argument string to be searched "in" (text), single spaces allowed
-	
-	IF(commandLineInput == false) requires two files in the same folder
-	@file pattern.txt containing the pattern to be searched for
-	@file text.txt containing the text to be searched in
-*/
+// Implementation of Backward Oracle Matching algorithm (Factor based approach).
+// Requires either a two command line arguments separated by a single space,
+// or two files in the same folder: "pattern.txt" containing the string to
+// be searched for, "text.txt" containing the text to be searched in.
 func main() {
-	if (commandLineInput == true) { //in case of command line input
+	if (commandLineInput == true) { // case of command line input
 		args := os.Args
 		if (len(args) <= 2) {
 			log.Fatal("Not enough arguments. Two string arguments separated by spaces are required!")
@@ -44,7 +37,7 @@ func main() {
 			fmt.Printf("\nRunning: Backward Oracle Matching algorithm.\n\n")
 		}
 		bom(s, pattern)
-	} else if (commandLineInput == false) { //in case of file line input
+	} else if (commandLineInput == false) { // case of file line input
 		patFile, err := ioutil.ReadFile("pattern.txt")
 		if err != nil {
 			log.Fatal(err)
@@ -67,14 +60,9 @@ func main() {
 	}
 }
 
-/**
-	Function bom performing the Backward Oracle Matching alghoritm.
-    Prints whether the word/pattern was found + positions of possible multiple occurences
-	or that the word was not found.
-	
-	@param t string/text to be searched in
-	@param p pattern/word to be serached for
-*/  
+// Function bom performing the Backward Oracle Matching algorithm.
+// Prints whether the word/pattern was found + positions of possible multiple occurrences
+// or that the word was not found.
 func bom(t, p string) {
 	startTime := time.Now()
 	n, m := len(t), len(p)
@@ -127,19 +115,13 @@ func bom(t, p string) {
 	return
 }
 
-/**
-	Construction of the factor oracle automaton for a word p.
-
-	@param p pattern to be added
-	@param supply supply map
-	@return oracle built oracle
-*/
+// Construction of the factor oracle automaton for a word p.
 func oracleOnLine(p string)(oracle map[int]map[uint8]int) {
 	if(debugMode==true) {
 		fmt.Printf("Oracle construction: \n")
 	}
 	oracle = make(map[int]map[uint8]int)
-	supply := make([]int, len(p)+2) //supply function
+	supply := make([]int, len(p)+2) // supply function
 	createNewState(0, oracle)
 	supply[0]=-1
 	var orP string
@@ -149,14 +131,7 @@ func oracleOnLine(p string)(oracle map[int]map[uint8]int) {
 	return oracle
 }
 
-/**
-	Adds one letter to the oracle.
-
-	@param oracle oracle to add letter to
-	@param p pattern (not whole, contained in oracle)
-	@param o letter to be added
-	@param supply supply map
-*/
+// Adds one letter to the oracle.
 func oracleAddLetter(oracle map[int]map[uint8]int, supply []int, orP string, o uint8)(oracleToReturn map[int]map[uint8]int, orPToReturn string) { 
 	m := len(orP)
 	var s int
@@ -176,10 +151,8 @@ func oracleAddLetter(oracle map[int]map[uint8]int, supply []int, orP string, o u
 	return oracle, orP+string(o)
 }
 
-/**	
-	Function that takes a single string and reverses it.
-	@author 'Walter' http://stackoverflow.com/a/10043083
-*/
+// Function that takes a single string and reverses it.
+// @author 'Walter' http://stackoverflow.com/a/10043083
 func reverse(s string) string {
     l := len(s)
     m := make([]rune, l)
@@ -190,12 +163,7 @@ func reverse(s string) string {
     return string(m)
 }
 
-/*******************          Automaton functions          *******************/
-
-/**
-	Automaton function for creating a new state 'state'.
-	@param 'at' automaton
-*/
+// Automaton function for creating a new state.
 func createNewState(state int, at map[int]map[uint8]int) {
 	at[state] = make(map[uint8]int)
 	if debugMode==true {
@@ -203,10 +171,7 @@ func createNewState(state int, at map[int]map[uint8]int) {
 	}
 }
 
-/**
- 	Creates a transition for function σ(state,letter) = end.
-	@param 'at' automaton
-*/
+// Creates a transition for function σ(state,letter) = end.
 func createTransition(fromState int, overChar uint8, toState int, at map[int]map[uint8]int) {
 	at[fromState][overChar]= toState
 	if debugMode==true {
@@ -214,10 +179,7 @@ func createTransition(fromState int, overChar uint8, toState int, at map[int]map
 	}
 }
 
-/**
-	Returns ending state for transition σ(fromState,overChar), '-1' if there is none.
-	@param 'at' automaton
-*/
+// Returns ending state for transition σ(fromState,overChar), -1 if there is none.
 func getTransition(fromState int, overChar uint8, at map[int]map[uint8]int)(toState int) {
 	if (!stateExists(fromState, at)) {
 		return -1
@@ -229,10 +191,7 @@ func getTransition(fromState int, overChar uint8, at map[int]map[uint8]int)(toSt
 	return toState
 }
 
-/**
-	Checks if state 'state' exists. Returns 'true' if it does, 'false' otherwise.
-	@param 'at' automaton
-*/
+// Checks if state exists. Returns true if it does, false otherwise.
 func stateExists(state int, at map[int]map[uint8]int)bool {
 	_, ok := at[state]
 	if (!ok || state == -1 || at[state] == nil) {
@@ -241,9 +200,7 @@ func stateExists(state int, at map[int]map[uint8]int)bool {
 	return true
 }
 
-/**
-	Just some printing of what the alghoritm does.
-*/
+// Just some printing of extra information about what the algorithm does.
 func prettyPrint(current int, j int, n int, pos int, t string, oracle map[int]map[uint8]int) {
 	if (current == 0 && !(getTransition(current, t[pos+j-1], oracle) == -1)) {
 		fmt.Printf("\n -->(%d)---(%c)--->(%d)", current, t[pos+j-1], getTransition(current, t[pos+j-1], oracle))

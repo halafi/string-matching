@@ -1,21 +1,23 @@
 ﻿package main
-import ("fmt"; "log"; "os"; "io/ioutil")
 
+import (
+	"fmt"
+	"log"
+	"os"
+	"io/ioutil"
+) 
+
+// User defined.
+// Set to true to read input from two command line arguments
+// Set to false to read input from two files "pattern.txt" and "text.txt"
 const commandLineInput bool = false
 
-/**
- 	Implementation of Boyer-Moore-Horspool algorithm (Sufix based aproach).
-	
-	If(commandLineInput == true) requires two command line arguments separated by one space.
-	@argument string to be searched "for" (pattern, search word), no spaces allowed
-	@argument string to be searched "in" (text), single spaces allowed
-	
-	If(commandLineInput == false) requires two files in the same folder as this file.
-	@file pattern.txt containing the pattern to be searched for
-	@file text.txt containing the text to be searched in
-*/
+// Implementation of Boyer-Moore-Horspool algorithm (Suffix based approach).
+// Requires either a two command line arguments separated by a single space,
+// or two files in the same folder: "pattern.txt" containing the string to
+// be searched for, "text.txt" containing the text to be searched in.
 func main() {
-	if (commandLineInput == true) { //in case of command line input
+	if (commandLineInput == true) { // case of command line input
 		args := os.Args
 		if (len(args) <= 2) {
 			log.Fatal("Not enough arguments. Two string arguments separated by spaces are required!")
@@ -32,7 +34,7 @@ func main() {
 		fmt.Printf("Search word (%d chars long): %q.\n",len(args[1]), pattern)
 		fmt.Printf("Text        (%d chars long): %q.\n\n",len(s), s)
 		horspool(s, pattern)
-	} else if (commandLineInput == false) { //in case of file line input
+	} else if (commandLineInput == false) { // case of file line input
 		patFile, err := ioutil.ReadFile("pattern.txt")
 		if err != nil {
 			log.Fatal(err)
@@ -51,13 +53,8 @@ func main() {
 	}
 }
 
-/**
-	Function horspool performing the Horspool algorithm
-    Prints whether the word/pattern was found and on what position in the text or not.
-	
-	@param t string/text to be searched in
-	@param p word/pattern to be serached for
-*/  
+// Function horspool performing the Horspool algorithm.
+// Prints whether the word/pattern was found and on what position in the text or not.
 func horspool(t, p string) {
 	m, n, c, pos := len(p), len(t), 0, 0
 	//Perprocessing
@@ -91,11 +88,8 @@ func horspool(t, p string) {
 	return
 }
 
-/**
- 	Function that precomputes map with Key: uint8 (char) Value: int. Values determine safe shifting of search window.
-
-	@Return map[uint8]int d filled map
-*/ 
+// Function that pre-computes map with Key: uint8 (char) Value: int. 
+// Values determine safe shifting of search window.
 func preprocess(t, p string)(d map[uint8]int) {
 	d = make(map[uint8]int)
 	for i := 0; i < len(t); i++ {
